@@ -16,19 +16,19 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query for server state, React hooks for local state
 - **UI Components**: shadcn/ui component library built on Radix UI primitives
 - **Styling**: Tailwind CSS with custom industrial/utility color palette
-- **Animations**: Framer Motion for smooth transitions
 - **Build Tool**: Vite with custom plugins for Replit integration
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
 - **API Design**: RESTful endpoints defined in `shared/routes.ts` with Zod validation
-- **Database ORM**: Drizzle ORM with PostgreSQL dialect
-- **Session Management**: Express sessions with PostgreSQL store (connect-pg-simple)
+- **Database**: Firebase Firestore (no ORM needed)
+- **Session Management**: Express sessions with memory store
 
 ### Data Layer
-- **Primary Database**: PostgreSQL via Drizzle ORM
-- **Schema Location**: `shared/schema.ts` - defines menu_items table with self-referential parent-child relationships
-- **External Data**: Firebase Firestore for admin authentication, facilities, and shopping lists
+- **Primary Database**: Firebase Firestore (no PostgreSQL dependency)
+- **Schema Location**: `shared/schema.ts` - defines MenuItem types with Zod validation
+- **Menu Data**: Loaded from static JSON file (`server/menu_data.json`)
+- **All Data**: Firebase Firestore for admin authentication, facilities, shopping lists, bio-waste, temperatures, sanitation records
 
 ### Animations & Performance
 - **Optimized for Old Devices**: All CSS animations (animate-spin, animate-pulse), transitions, and hover effects have been removed to minimize CPU/GPU load.
@@ -43,9 +43,8 @@ To export and move this project to another environment:
 2. **Environment Setup**:
    - Ensure Node.js 20+ is installed.
    - Run `npm install` to install dependencies.
-   - Run `npx drizzle-kit push` to synchronize the local PostgreSQL database schema.
 3. **Environment Variables**:
-   - Re-configure the required secrets: `DATABASE_URL`, `FIREBASE_API_KEY`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`.
+   - Re-configure the required secrets: `FIREBASE_API_KEY`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`.
 4. **Running the App**:
    - Development: `npm run dev`
    - Production: `npm run build` followed by `npm start`
@@ -64,12 +63,11 @@ This project is configured for Render deployment:
    - Select the repository with Tofako project
 
 3. **Configuration** (set in Render dashboard):
-   - **Build Command**: `npm install && npm run build && npm run db:push`
+   - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm start`
    - **Node Version**: 20.x (auto-detected from package.json)
 
 4. **Environment Variables** (set in Render Environment tab):
-   - `DATABASE_URL` - PostgreSQL connection string (use Render PostgreSQL or Neon)
    - `FIREBASE_API_KEY` - Firebase API key
    - `FIREBASE_PROJECT_ID` - Firebase project ID
    - `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
@@ -78,7 +76,7 @@ This project is configured for Render deployment:
 5. **How it works**:
    - Frontend: Built with Vite, served as static files from `dist/public`
    - Backend: Express.js server bundled with esbuild
-   - Database: PostgreSQL with Drizzle ORM
+   - Database: Firebase Firestore only (no PostgreSQL)
 
 **Note**: render.yaml is included for automatic configuration if you use "Blueprint" deployment.
 
@@ -91,7 +89,6 @@ This project is also configured for Vercel deployment:
    - Import the project to Vercel
 
 2. **Environment Variables** (set in Vercel dashboard):
-   - `DATABASE_URL` - PostgreSQL connection string (use Neon or similar)
    - `FIREBASE_API_KEY` - Firebase API key
    - `FIREBASE_PROJECT_ID` - Firebase project ID
    - `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
@@ -109,7 +106,6 @@ This project is also configured for Vercel deployment:
 ### Build System
 - **Development**: Vite dev server with HMR proxied through Express
 - **Production**: esbuild bundles server code, Vite builds client to `dist/public`
-- **Database Migrations**: Drizzle Kit with `db:push` command
 
 ## External Dependencies
 
@@ -124,8 +120,7 @@ This project is also configured for Vercel deployment:
   - `NakupneZoznamy/` - Shopping list data per facility
 
 ### Required Environment Variables
-- `DATABASE_URL` - PostgreSQL connection string (required)
-- `FIREBASE_API_KEY` - Firebase API key (optional, disables Firebase features if missing)
+- `FIREBASE_API_KEY` - Firebase API key (required for full functionality)
 - `FIREBASE_PROJECT_ID` - Firebase project identifier
 - `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
 
@@ -169,4 +164,4 @@ This project is also configured for Vercel deployment:
 ### Known Considerations
 - All temperature data stored in Firebase Firestore (facility collection, Teploty document)
 - Quarterly sanitation data stored in same Firestore structure
-- PostgreSQL database maintains menu hierarchy via Drizzle ORM
+- Menu navigation loaded from static JSON file (`server/menu_data.json`)
