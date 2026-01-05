@@ -2,7 +2,7 @@
 
 ## Overview
 
-Tofako Control is a full-stack management application for operational processes at Tofako company facilities. The system provides hierarchical menu navigation for controlling and monitoring various operational workflows including bio-waste tracking, sanitation schedules, temperature monitoring, shopping lists, and DPH (tax) reporting. The application is designed for use by facility workers, with PIN-based device authentication and facility-specific data isolation.
+Tofako Control is a full-stack management application for operational processes at Tofako company facilities. The system provides a hierarchical menu navigation for controlling and monitoring various facility operations including temperature checks, sanitation schedules, documentation, and shopping lists. Built as a mobile-first web application with Slovak language interface.
 
 ## User Preferences
 
@@ -16,59 +16,152 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query for server state, React hooks for local state
 - **UI Components**: shadcn/ui component library built on Radix UI primitives
 - **Styling**: Tailwind CSS with custom industrial/utility color palette
-- **Build Tool**: Vite with Replit-specific plugins for development
+- **Build Tool**: Vite with custom plugins for Replit integration
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
-- **API Design**: RESTful endpoints with Zod validation for request/response schemas
-- **Database ORM**: Drizzle ORM configured for PostgreSQL
-- **Static Data**: Menu structure loaded from JSON file (`server/menu_data.json`) for performance
+- **API Design**: RESTful endpoints defined in `shared/routes.ts` with Zod validation
+- **Database**: Firebase Firestore (no ORM needed)
+- **Session Management**: Express sessions with memory store
 
 ### Data Layer
-- **Primary Database**: PostgreSQL via Drizzle ORM (schema in `shared/schema.ts`)
-- **Menu Storage**: Static JSON-based menu items with self-referential parent-child relationships
-- **External Data**: Firebase Firestore for admin authentication, facilities configuration, and operational data (bio-waste, temperatures, sanitation records, shopping lists)
+- **Primary Database**: Firebase Firestore (no PostgreSQL dependency)
+- **Schema Location**: `shared/schema.ts` - defines MenuItem types with Zod validation
+- **Menu Data**: Loaded from static JSON file (`server/menu_data.json`)
+- **All Data**: Firebase Firestore for admin authentication, facilities, shopping lists, bio-waste, temperatures, sanitation records
 
-### Key Design Decisions
-1. **Hybrid Storage**: PostgreSQL for relational menu structure, Firebase Firestore for facility-specific operational data
-2. **Device Authentication**: PIN-based auth stored in localStorage, verified against Firebase admin code
-3. **Performance Optimization**: All CSS animations removed to support older devices; framer-motion uninstalled
-4. **Facility Isolation**: Each facility's data stored in separate Firestore collections/documents
+### Animations & Performance
+- **Optimized for Old Devices**: All CSS animations (animate-spin, animate-pulse), transitions, and hover effects have been removed to minimize CPU/GPU load.
+- **Library Removal**: `framer-motion` has been uninstalled to reduce bundle size and memory usage.
+- **UI State**: Interactive elements use solid state changes instead of animated transitions for immediate responsiveness.
 
-### Project Structure
-```
-client/src/          # React frontend
-  pages/             # Route components (Dashboard, BioWaste, Temperatures, etc.)
-  components/        # Reusable UI components
-  hooks/             # Custom React hooks
-server/              # Express backend
-  routes.ts          # API endpoint definitions
-  firebase.ts        # Firestore integration
-  storage.ts         # Menu data storage layer
-shared/              # Shared types and schemas
-  schema.ts          # Drizzle database schema
-  routes.ts          # API route contracts with Zod
-```
+## Export & Import (ZIP) Instructions
+
+To export and move this project to another environment:
+
+1. **Download as ZIP**: Use the Replit "Download as ZIP" feature.
+2. **Environment Setup**:
+   - Ensure Node.js 20+ is installed.
+   - Run `npm install` to install dependencies.
+3. **Environment Variables**:
+   - Re-configure the required secrets: `FIREBASE_API_KEY`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`.
+4. **Running the App**:
+   - Development: `npm run dev`
+   - Production: `npm run build` followed by `npm start`
+
+## Render Deployment Instructions
+
+This project is configured for Render deployment:
+
+1. **Push to GitHub**:
+   - Export project to GitHub repository
+   - Make sure all files are committed
+
+2. **Create Web Service on Render**:
+   - Go to Render Dashboard > New > Web Service
+   - Connect your GitHub repository
+   - Select the repository with Tofako project
+
+3. **Configuration** (set in Render dashboard):
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm start`
+   - **Node Version**: 20.x (auto-detected from package.json)
+
+4. **Environment Variables** (set in Render Environment tab):
+   - `FIREBASE_API_KEY` - Firebase API key
+   - `FIREBASE_PROJECT_ID` - Firebase project ID
+   - `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
+   - `NODE_ENV` - set to `production`
+
+5. **How it works**:
+   - Frontend: Built with Vite, served as static files from `dist/public`
+   - Backend: Express.js server bundled with esbuild
+   - Database: Firebase Firestore only (no PostgreSQL)
+
+**Note**: render.yaml is included for automatic configuration if you use "Blueprint" deployment.
+
+## Vercel Deployment Instructions
+
+This project is also configured for Vercel deployment:
+
+1. **Import to Vercel**:
+   - Connect your GitHub/GitLab repository or use Vercel CLI
+   - Import the project to Vercel
+
+2. **Environment Variables** (set in Vercel dashboard):
+   - `FIREBASE_API_KEY` - Firebase API key
+   - `FIREBASE_PROJECT_ID` - Firebase project ID
+   - `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
+
+3. **Configuration**:
+   - Build command: `npm run vercel-build` (auto-detected from vercel.json)
+   - Output directory: `dist/public` (auto-detected)
+   - API routes: Located in `/api/index.ts` as serverless function
+
+4. **How it works**:
+   - Frontend: Built with Vite, served as static files from `dist/public`
+   - Backend API: Runs as Vercel serverless function at `/api/*`
+   - All API routes are handled by single serverless function for simplicity
+
+### Build System
+- **Development**: Vite dev server with HMR proxied through Express
+- **Production**: esbuild bundles server code, Vite builds client to `dist/public`
 
 ## External Dependencies
 
-### Database
-- **PostgreSQL**: Primary database via `DATABASE_URL` environment variable
-- **Drizzle ORM**: Schema management and queries
-
-### Firebase Services
-- **Firebase Firestore**: Document database for operational data
-- **Configuration**: `google-services.json` contains project credentials
-- **Collections**: Global (adminCode), facilities, shopping lists, bio-waste, temperatures, sanitation records
-
-### Third-Party APIs
-- **FTP (basic-ftp)**: Used for Excel file uploads in DPH reporting
-- **XLSX**: Excel file generation for reports
+### Firebase Integration
+- **Purpose**: Admin code verification, facility management, shopping list storage
+- **Services Used**: Firestore for document storage
+- **Configuration**: Environment variables for API keys and project settings
+- **Data Structure**:
+  - `Global/adminCode` - Admin authentication codes
+  - `Global/appTimerMinutes` - Application session timer
+  - `Prevadzky/` - Facility definitions
+  - `NakupneZoznamy/` - Shopping list data per facility
 
 ### Required Environment Variables
-- `DATABASE_URL`: PostgreSQL connection string
-- Firebase credentials are embedded in `google-services.json` and `server/firebase.ts`
+- `FIREBASE_API_KEY` - Firebase API key (required for full functionality)
+- `FIREBASE_PROJECT_ID` - Firebase project identifier
+- `FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
 
-### Deployment
-- **Vercel**: Production deployment configured via `vercel.json`
-- **API Routes**: Serverless functions in `api/` directory for Vercel
+### Third-Party Libraries
+- **UI**: Radix UI primitives, Lucide icons, class-variance-authority
+- **Forms**: React Hook Form with Zod resolver
+- **Date Handling**: date-fns
+- **HTTP Client**: Native fetch API wrapped in TanStack Query
+
+## Recent Updates (December 31, 2025)
+
+### Bug Fixes & Features
+1. **Firebase Configuration**
+   - Added environment variables for FIREBASE_API_KEY, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET
+   - Firebase Firestore integration now fully operational
+
+2. **Quarterly Sanitation (Kvartálna sanitácia)**
+   - Added missing GET endpoint `/api/sanitation/:facilityId` to retrieve quarterly sanitation history
+   - Endpoint properly fetches data from Firebase Firestore
+
+3. **Temperature Logging (Teploty)**
+   - Implemented period-aware temperature tracking: distinct MORNING and EVENING readings per fridge/date
+   - Fixed race condition in batch temperature saves using Firestore atomic writes
+   - Auto-fill buttons ("Ranné t. auto", "Večerné t. auto") now correctly save all refrigerators simultaneously
+   - Temperature history updates automatically after saving (no page refresh needed)
+   - Calendar date picker now closes automatically after selection
+   - Existing temperature entries are replaced (not duplicated) when same date/fridge/period is saved
+
+### Technical Implementation Details
+- **Temperature Deduplication**: Matches by date (YYYY-MM-DD), fridge number, and period (morning/evening)
+- **Auto-fill Mechanism**: Uses Promise.allSettled() to ensure all refrigerators process even if some fail
+- **UI Responsiveness**: Implements direct history refetch after auto-fill saves
+- **Calendar UX**: Popover state-controlled to auto-close on date selection
+
+### Files Modified
+- `server/routes.ts` - Added GET /api/sanitation/:facilityId endpoint
+- `server/firebase.ts` - Enhanced saveTemperature() with deduplication logic and atomic writes
+- `client/src/pages/TeplotyPage.tsx` - Improved auto-fill, calendar handling, and history refresh
+- Configuration files - Firebase environment variables integrated
+
+### Known Considerations
+- All temperature data stored in Firebase Firestore (facility collection, Teploty document)
+- Quarterly sanitation data stored in same Firestore structure
+- Menu navigation loaded from static JSON file (`server/menu_data.json`)
