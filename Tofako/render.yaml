@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: tofako
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build && npm run db:push
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: FIREBASE_API_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_STORAGE_BUCKET
+        sync: false

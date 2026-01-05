@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Industrial / Utility Palette */
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --background: 210 20% 96%;
+  --foreground: 220 13% 18%; /* Dark Gunmetal */
+
+  --primary: 200 98% 39%; /* Industrial Blue */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 42 87% 55%; /* Safety Orange/Yellow for emphasis */
+  --secondary-foreground: 220 13% 18%;
+
+  --muted: 210 20% 90%;
+  --muted-foreground: 215 16% 40%;
+
+  --accent: 210 20% 90%;
+  --accent-foreground: 220 13% 18%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 215 16% 80%;
+  --input: 214 16% 80%;
+  --ring: 200 98% 39%;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+
+  --primary: 200 98% 39%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 42 87% 55%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 200 98% 39%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+/* Custom Scrollbar for utility feel */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted)); 
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.5); 
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary)); 
+}

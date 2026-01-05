@@ -1,0 +1,8 @@
+node_modules
+.git
+.replit
+replit.nix
+.local
+*.log
+.cache
+zipFile.zip

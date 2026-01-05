@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "303356789380",
+    "project_id": "dochadzacka-f08af",
+    "storage_bucket": "dochadzacka-f08af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:303356789380:android:25ae4982efd616d84178d1",
+        "android_client_info": {
+          "package_name": "com.tofako.aplikacia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkXWl0gk86nRZPKxWkWFnHFAmnen_xlrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
